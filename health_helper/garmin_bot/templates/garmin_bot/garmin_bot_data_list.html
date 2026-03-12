@@ -1,0 +1,45 @@
+{% extends 'base.html' %} 
+
+{% block content %}
+<div class="container mt-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Garmin Health History</h2>
+        <a href="{% url 'garmin_bot_detail' %}" class="btn btn-secondary">Back to Dashboard</a>
+    </div>
+
+    {% if garmin_data_list %}
+    <div class="table-responsive">
+        <table class="table table-striped table-hover">
+            <thead class="table-dark">
+                <tr>
+                    <th>Date</th>
+                    <th>Resting HR</th>
+                    <th>VO2 Max</th>
+                    <th>Active Mins</th>
+                    <th>Latest Activity</th>
+                    <th>Running Dist</th>
+                    <th>Cycling Dist</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for record in garmin_data_list %}
+                <tr>
+                    <td><strong>{{ record.date_recorded }}</strong></td>
+                    <td>{{ record.heart_rate }} bpm</td>
+                    <td>{{ record.VO2_max }}</td>
+                    <td>{{ record.active_minutes }}</td>
+                    <td><span class="badge bg-secondary">{{ record.activty_type }}</span> ({{ record.activty_amount }}m)</td>
+                    <td>{{ record.running.distance }}m</td>
+                    <td>{{ record.cycling.distance }}m</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="alert alert-warning mt-3">
+        No historical Garmin data found.
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

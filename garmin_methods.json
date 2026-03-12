@@ -1,0 +1,214 @@
+[
+  {
+    "name": "add_hydration_data",
+    "signature": "(self, value_in_ml: float, timestamp: str | None = None, cdate: str | None = None) -> dict[str, typing.Any]"
+  },
+  {
+    "name": "add_weigh_in_with_timestamps",
+    "signature": "(self, weight: int | float, unitKey: str = 'kg', dateTimestamp: str = '', gmtTimestamp: str = '') -> dict[str, typing.Any] | None"
+  },
+  {
+    "name": "create_manual_activity",
+    "signature": "(self, start_datetime: str, time_zone: str, type_key: str, distance_km: float, duration_min: int, activity_name: str) -> Any"
+  },
+  {
+    "name": "delete_blood_pressure",
+    "signature": "(self, version: str, cdate: str) -> dict[str, typing.Any]"
+  },
+  {
+    "name": "delete_weigh_in",
+    "signature": "(self, weight_pk: str, cdate: str) -> Any"
+  },
+  {
+    "name": "delete_weigh_ins",
+    "signature": "(self, cdate: str, delete_all: bool = False) -> int | None"
+  },
+  {
+    "name": "get_activities",
+    "signature": "(self, start: int = 0, limit: int = 20, activitytype: str | None = None) -> dict[str, typing.Any] | list[typing.Any]"
+  },
+  {
+    "name": "get_activities_by_date",
+    "signature": "(self, startdate: str, enddate: str | None = None, activitytype: str | None = None, sortorder: str | None = None) -> list[dict[str, typing.Any]]"
+  },
+  {
+    "name": "get_activities_fordate",
+    "signature": "(self, fordate: str) -> dict[str, typing.Any]"
+  },
+  {
+    "name": "get_adhoc_challenges",
+    "signature": "(self, start: int, limit: int) -> dict[str, typing.Any]"
+  },
+  {
+    "name": "get_all_day_events",
+    "signature": "(self, cdate: str) -> dict[str, typing.Any]"
+  },
+  {
+    "name": "get_all_day_stress",
+    "signature": "(self, cdate: str) -> dict[str, typing.Any]"
+  },
+  {
+    "name": "get_available_badge_challenges",
+    "signature": "(self, start: int, limit: int) -> dict[str, typing.Any]"
+  },
+  {
+    "name": "get_badge_challenges",
+    "signature": "(self, start: int, limit: int) -> dict[str, typing.Any]"
+  },
+  {
+    "name": "get_blood_pressure",
+    "signature": "(self, startdate: str, enddate: str | None = None) -> dict[str, typing.Any]"
+  },
+  {
+    "name": "get_body_battery",
+    "signature": "(self, startdate: str, enddate: str | None = None) -> list[dict[str, typing.Any]]"
+  },
+  {
+    "name": "get_body_battery_events",
+    "signature": "(self, cdate: str) -> list[dict[str, typing.Any]]"
+  },
+  {
+    "name": "get_body_composition",
+    "signature": "(self, startdate: str, enddate: str | None = None) -> dict[str, typing.Any]"
+  },
+  {
+    "name": "get_daily_steps",
+    "signature": "(self, start: str, end: str) -> list[dict[str, typing.Any]]"
+  },
+  {
+    "name": "get_daily_weigh_ins",
+    "signature": "(self, cdate: str) -> dict[str, typing.Any]"
+  },
+  {
+    "name": "get_device_solar_data",
+    "signature": "(self, device_id: str, startdate: str, enddate: str | None = None) -> list[dict[str, typing.Any]]"
+  },
+  {
+    "name": "get_endurance_score",
+    "signature": "(self, startdate: str, enddate: str | None = None) -> dict[str, typing.Any]"
+  },
+  {
+    "name": "get_fitnessage_data",
+    "signature": "(self, cdate: str) -> dict[str, typing.Any]"
+  },
+  {
+    "name": "get_floors",
+    "signature": "(self, cdate: str) -> dict[str, typing.Any]"
+  },
+  {
+    "name": "get_goals",
+    "signature": "(self, status: str = 'active', start: int = 1, limit: int = 30) -> list[dict[str, typing.Any]]"
+  },
+  {
+    "name": "get_heart_rates",
+    "signature": "(self, cdate: str) -> dict[str, typing.Any]"
+  },
+  {
+    "name": "get_hill_score",
+    "signature": "(self, startdate: str, enddate: str | None = None) -> dict[str, typing.Any]"
+  },
+  {
+    "name": "get_hrv_data",
+    "signature": "(self, cdate: str) -> dict[str, typing.Any] | None"
+  },
+  {
+    "name": "get_hydration_data",
+    "signature": "(self, cdate: str) -> dict[str, typing.Any]"
+  },
+  {
+    "name": "get_inprogress_virtual_challenges",
+    "signature": "(self, start: int, limit: int) -> dict[str, typing.Any]"
+  },
+  {
+    "name": "get_intensity_minutes_data",
+    "signature": "(self, cdate: str) -> dict[str, typing.Any]"
+  },
+  {
+    "name": "get_lactate_threshold",
+    "signature": "(self, *, latest: bool = True, start_date: str | datetime.date | None = None, end_date: str | datetime.date | None = None, aggregation: str = 'daily') -> dict[str, typing.Any]"
+  },
+  {
+    "name": "get_lifestyle_logging_data",
+    "signature": "(self, cdate: str) -> dict[str, typing.Any]"
+  },
+  {
+    "name": "get_max_metrics",
+    "signature": "(self, cdate: str) -> dict[str, typing.Any]"
+  },
+  {
+    "name": "get_menstrual_calendar_data",
+    "signature": "(self, startdate: str, enddate: str) -> dict[str, typing.Any]"
+  },
+  {
+    "name": "get_menstrual_data_for_date",
+    "signature": "(self, fordate: str) -> dict[str, typing.Any]"
+  },
+  {
+    "name": "get_non_completed_badge_challenges",
+    "signature": "(self, start: int, limit: int) -> dict[str, typing.Any]"
+  },
+  {
+    "name": "get_progress_summary_between_dates",
+    "signature": "(self, startdate: str, enddate: str, metric: str = 'distance', groupbyactivities: bool = True) -> dict[str, typing.Any]"
+  },
+  {
+    "name": "get_race_predictions",
+    "signature": "(self, startdate: str | None = None, enddate: str | None = None, _type: str | None = None) -> dict[str, typing.Any]"
+  },
+  {
+    "name": "get_respiration_data",
+    "signature": "(self, cdate: str) -> dict[str, typing.Any]"
+  },
+  {
+    "name": "get_rhr_day",
+    "signature": "(self, cdate: str) -> dict[str, typing.Any]"
+  },
+  {
+    "name": "get_sleep_data",
+    "signature": "(self, cdate: str) -> dict[str, typing.Any]"
+  },
+  {
+    "name": "get_spo2_data",
+    "signature": "(self, cdate: str) -> dict[str, typing.Any]"
+  },
+  {
+    "name": "get_stats",
+    "signature": "(self, cdate: str) -> dict[str, typing.Any]"
+  },
+  {
+    "name": "get_stats_and_body",
+    "signature": "(self, cdate: str) -> dict[str, typing.Any]"
+  },
+  {
+    "name": "get_steps_data",
+    "signature": "(self, cdate: str) -> list[dict[str, typing.Any]]"
+  },
+  {
+    "name": "get_stress_data",
+    "signature": "(self, cdate: str) -> dict[str, typing.Any]"
+  },
+  {
+    "name": "get_training_readiness",
+    "signature": "(self, cdate: str) -> dict[str, typing.Any]"
+  },
+  {
+    "name": "get_training_status",
+    "signature": "(self, cdate: str) -> dict[str, typing.Any]"
+  },
+  {
+    "name": "get_user_summary",
+    "signature": "(self, cdate: str) -> dict[str, typing.Any]"
+  },
+  {
+    "name": "get_weigh_ins",
+    "signature": "(self, startdate: str, enddate: str) -> dict[str, typing.Any]"
+  },
+  {
+    "name": "get_workouts",
+    "signature": "(self, start: int = 0, limit: int = 100) -> dict[str, typing.Any]"
+  },
+  {
+    "name": "request_reload",
+    "signature": "(self, cdate: str) -> dict[str, typing.Any]"
+  }
+]

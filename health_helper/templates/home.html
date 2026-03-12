@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+<div class="container px-4 py-5" id="featured-3">
+    <div class="row align-items-center mb-5 hero-section">
+        <div class="col-lg-7 text-center text-lg-start">
+            <h1 class="display-4 fw-bold lh-1 mb-3 text-primary title-anim">Sync & Analyze Your Garmin Data</h1>
+            <p class="lead">Connect your Garmin account to pull sleep, activity, HRV, and daily metrics automatically. View rich insights and manage your fitness data directly from your dashboard.</p>
+            <div class="d-grid gap-2 d-md-flex justify-content-md-start">
+                {% if user.is_authenticated %}
+                    <a href="{% url 'garmin_bot_detail' %}" class="btn btn-primary btn-lg px-4 me-md-2 btn-hover">View Dashboard</a>
+                {% else %}
+                    <a href="{% url 'register' %}" class="btn btn-primary btn-lg px-4 me-md-2 btn-hover">Get Started</a>
+                    <a href="{% url 'login' %}" class="btn btn-outline-secondary btn-lg px-4 btn-hover">Log In</a>
+                {% endif %}
+            </div>
+        </div>
+        <div class="col-lg-5 p-3 d-none d-lg-block">
+             <div class="card shadow-lg feature-card">
+                 <div class="card-body p-4 text-center">
+                     <i class="bi bi-graph-up-arrow display-1 text-success mb-3 d-block"></i>
+                     <h3 class="card-title h4">Smart Tracking</h3>
+                     <p class="card-text text-muted">Advanced analytics and historical trends from your wearable devices.</p>
+                 </div>
+             </div>
+        </div>
+    </div>
+
+    <hr class="my-5">
+
+    <div class="row g-4 py-5 row-cols-1 row-cols-lg-3">
+      <div class="col feature-col">
+        <div class="feature-icon d-inline-flex align-items-center justify-content-center bg-primary bg-gradient text-white fs-2 mb-3 rounded-3 p-3 shadow-sm">
+          <i class="bi bi-moon-stars"></i>
+        </div>
+        <h3 class="fs-2 text-body-emphasis">Sleep Analysis</h3>
+        <p>View detailed sleep stages, duration, and score right from your Garmin device. Understand your recovery like never before.</p>
+      </div>
+      <div class="col feature-col" style="animation-delay: 0.1s;">
+        <div class="feature-icon d-inline-flex align-items-center justify-content-center bg-danger bg-gradient text-white fs-2 mb-3 rounded-3 p-3 shadow-sm">
+          <i class="bi bi-heart-pulse"></i>
+        </div>
+        <h3 class="fs-2 text-body-emphasis">Vital Signs</h3>
+        <p>Monitor continuous heart rate and daily HRV averages to ensure you are training in the right zones.</p>
+      </div>
+      <div class="col feature-col" style="animation-delay: 0.2s;">
+        <div class="feature-icon d-inline-flex align-items-center justify-content-center bg-success bg-gradient text-white fs-2 mb-3 rounded-3 p-3 shadow-sm">
+          <i class="bi bi-fire"></i>
+        </div>
+        <h3 class="fs-2 text-body-emphasis">Activities</h3>
+        <p>Track your daily steps, active calories, and individual workout metrics automatically synced into your unified dashboard.</p>
+      </div>
+    </div>
+</div>
+{% endblock %}

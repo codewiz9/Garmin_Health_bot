@@ -1,0 +1,95 @@
+{% extends 'base.html' %} 
+
+{% block content %}
+<div class="container mt-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Garmin Health Dashboard</h2>
+        <div>
+            <a href="{% url 'garmin_bot_update_data' %}" class="btn btn-primary">Sync Latest Data</a>
+            <a href="{% url 'garmin_bot_list_data' %}" class="btn btn-secondary">View History</a>
+        </div>
+    </div>
+
+    {% if latest_data %}
+    <p class="text-muted">Latest sync from: {{ latest_data.date_recorded }}</p>
+
+    <div class="row">
+        <div class="col-md-4 mb-3">
+            <div class="card bg-light">
+                <div class="card-body text-center">
+                    <h5 class="card-title">Resting Heart Rate</h5>
+                    <h2 class="text-danger">{{ latest_data.heart_rate }} <small>bpm</small></h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-3">
+            <div class="card bg-light">
+                <div class="card-body text-center">
+                    <h5 class="card-title">VO2 Max</h5>
+                    <h2 class="text-success">{{ latest_data.VO2_max }}</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-3">
+            <div class="card bg-light">
+                <div class="card-body text-center">
+                    <h5 class="card-title">Active Minutes</h5>
+                    <h2 class="text-info">{{ latest_data.active_minutes }} <small>min</small></h2>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <h4 class="mt-4">Latest Activity Highlights</h4>
+    <div class="row">
+        <!-- Running -->
+        <div class="col-md-6 mb-3">
+            <div class="card">
+                <div class="card-header bg-primary text-white">Running</div>
+                <div class="card-body">
+                    <p><strong>Distance:</strong> {{ latest_data.running.distance }}m</p>
+                    <p><strong>Duration:</strong> {{ latest_data.running.time }} min</p>
+                    <p><strong>Avg HR:</strong> {{ latest_data.running.avg_heart_rate }} bpm</p>
+                </div>
+            </div>
+        </div>
+        <!-- Cycling -->
+        <div class="col-md-6 mb-3">
+            <div class="card">
+                <div class="card-header bg-success text-white">Cycling</div>
+                <div class="card-body">
+                    <p><strong>Distance:</strong> {{ latest_data.cycling.distance }}m</p>
+                    <p><strong>Duration:</strong> {{ latest_data.cycling.time }} min</p>
+                    <p><strong>Avg HR:</strong> {{ latest_data.cycling.avg_heart_rate }} bpm</p>
+                </div>
+            </div>
+        </div>
+        <!-- Swimming -->
+        <div class="col-md-6 mb-3">
+            <div class="card">
+                <div class="card-header bg-info text-white">Swimming</div>
+                <div class="card-body">
+                    <p><strong>Distance:</strong> {{ latest_data.swimming.distance }}m</p>
+                    <p><strong>Duration:</strong> {{ latest_data.swimming.time }} min</p>
+                    <p><strong>Avg HR:</strong> {{ latest_data.swimming.avg_heart_rate }} bpm</p>
+                </div>
+            </div>
+        </div>
+        <!-- Lifting -->
+        <div class="col-md-6 mb-3">
+            <div class="card">
+                <div class="card-header bg-secondary text-white">Strength Training</div>
+                <div class="card-body">
+                    <p><strong>Volume:</strong> {{ latest_data.lifting.volume }} kg</p>
+                    <p><strong>Sets/Reps:</strong> {{ latest_data.lifting.sets }}x{{ latest_data.lifting.reps }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <div class="alert alert-warning mt-3">
+        No Garmin data found. Please sync your data using the button above. (Make sure you have linked your Garmin account in the Django Admin or Setup first!)
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
