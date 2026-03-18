@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <h2>Garmin Settings</h2>
+  <p>Connect your Garmin account so we can sync your data securely using tokens. Your password is never stored.</p>
+
+  <form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Save & Link Garmin</button>
+  </form>
+{% endblock %}
+

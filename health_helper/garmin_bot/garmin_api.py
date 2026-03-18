@@ -3,7 +3,8 @@ from pathlib import Path
 from datetime import date
 from garminconnect import Garmin
 from garth.exc import GarthHTTPError
-from .models import GarminUserData, RunningStats, CyclingStats, SwimmingStats, LiftingStats, GarminToken
+from .models import GarminUserData, RunningStats, CyclingStats, SwimmingStats, LiftingStats
+from users.models import GarminToken
 
 def link_garmin_account(user, username, plaintext_password):
     try:
