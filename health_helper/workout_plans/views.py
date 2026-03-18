@@ -10,14 +10,12 @@ class WorkoutPlanListView(ListView):
 class WorkoutPlanCreateView(CreateView):
     pass
 
-# this view will update the weekly workout plan for  the user
+# this view will update wether a day of the workout plan was completed or not
+# check every day defult to not complet if user dose not log
 class WorkoutPlanUpdateView(UpdateView):
     pass
 
-# this view will delete the weekly workout plan for the user
+# this view will delete the workoout pkan
 class WorkoutPlanDeleteView(DeleteView):
     pass
 
-# this view will allow the user to mark a workout plan as complete for the spcific day of the week
-class WorkoutPlanCompleteView(UpdateView):
-    pass
