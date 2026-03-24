@@ -7,4 +7,5 @@ urlpatterns = [
     path('<int:pk>/update/', views.WorkoutPlanUpdateView.as_view(), name='workout_plan_update'),
     path('<int:pk>/delete/', views.WorkoutPlanDeleteView.as_view(), name='workout_plan_delete'),
     path('<int:pk>/complete/', views.WorkoutPlanCompleteView.as_view(), name='workout_plan_complete'),
+    path('import/garmin/', views.ImportGarminWorkoutsView.as_view(), name='import_garmin_workouts'),
 ]
