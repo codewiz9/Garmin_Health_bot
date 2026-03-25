@@ -1,0 +1,150 @@
+{% extends "base.html" %}
+
+{% block title %}{% if object %}Edit{% else %}Create{% endif %} Workout Plan{% endblock %}
+
+{% block content %}
+<h2 class="mb-3">{% if object %}Edit{% else %}Create{% endif %} Workout Plan</h2>
+
+<form method="post" class="card shadow-sm">
+  <div class="card-body">
+    {% csrf_token %}
+    <div class="mb-3">
+      <label for="id_name" class="form-label">Plan Name</label>
+      {{ form.name }}
+    </div>
+
+    <h5 class="mt-4">Weekly Days</h5>
+    <p class="text-muted small mb-3">Assign one or more imported Garmin workouts or cardio activities per day (optional).</p>
+
+    {% for row in day_rows %}
+      <div class="border rounded p-3 mb-3" data-day-block>
+        <div class="d-flex justify-content-between align-items-center mb-2">
+          <div class="form-label mb-0"><strong>{{ row.label }}</strong></div>
+          <button type="button" class="btn btn-sm btn-outline-primary" data-add-workout>Add workout</button>
+        </div>
+
+        <div class="row g-2 mb-2">
+          <div class="col-md-12">
+            <input
+              type="text"
+              class="form-control"
+              name="day_{{ row.value }}_notes"
+              placeholder="Day notes (optional)"
+              value="{% if row.existing %}{{ row.existing.notes }}{% endif %}"
+            >
+          </div>
+        </div>
+
+        <div data-items>
+          {% for selected in row.selected_activities %}
+            <div class="row g-2 align-items-center mb-2" data-item-row>
+              <div class="col-md-10">
+                <select class="form-select" name="day_{{ row.value }}_workouts">
+                  <option value="">No workout</option>
+                  <optgroup label="Cardio Activities">
+                    {% for value, label in cardio_activities %}
+                      <option value="cardio:{{ value }}" {% if selected == "cardio:"|add:value %}selected{% endif %}>
+                        {{ label }}
+                      </option>
+                    {% endfor %}
+                  </optgroup>
+                  <optgroup label="My Garmin Workouts">
+                  {% for workout in garmin_workout_options %}
+                    <option value="{{ workout.value }}" {% if selected == workout.value %}selected{% endif %}>
+                      {{ workout.label }}
+                    </option>
+                  {% endfor %}
+                  </optgroup>
+                </select>
+              </div>
+              <div class="col-md-2 d-grid">
+                <button type="button" class="btn btn-outline-danger" data-remove-workout>Remove</button>
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+
+        <template data-item-template>
+          <div class="row g-2 align-items-center mb-2" data-item-row>
+            <div class="col-md-10">
+              <select class="form-select">
+                <option value="">No workout</option>
+                <optgroup label="Cardio Activities">
+                  {% for value, label in cardio_activities %}
+                    <option value="cardio:{{ value }}">{{ label }}</option>
+                  {% endfor %}
+                </optgroup>
+                <optgroup label="My Garmin Workouts">
+                {% for workout in garmin_workout_options %}
+                  <option value="{{ workout.value }}">{{ workout.label }}</option>
+                {% endfor %}
+                </optgroup>
+              </select>
+            </div>
+            <div class="col-md-2 d-grid">
+              <button type="button" class="btn btn-outline-danger" data-remove-workout>Remove</button>
+            </div>
+          </div>
+        </template>
+      </div>
+    {% endfor %}
+  </div>
+
+  <div class="card-footer d-flex gap-2">
+    <button type="submit" class="btn btn-primary">Save Plan</button>
+    <a href="{% url 'workout_plan_list' %}" class="btn btn-outline-secondary">Cancel</a>
+  </div>
+</form>
+
+<script>
+  (function () {
+    function wireDayBlock(block) {
+      const addBtn = block.querySelector("[data-add-workout]");
+      const items = block.querySelector("[data-items]");
+      const template = block.querySelector("template[data-item-template]");
+      if (!addBtn || !items || !template) return;
+
+      function ensureAtLeastOneRow() {
+        const rows = items.querySelectorAll("[data-item-row]");
+        if (rows.length === 0) {
+          addRow();
+        }
+      }
+
+      function addRow() {
+        const fragment = template.content.cloneNode(true);
+        const row = fragment.querySelector("[data-item-row]");
+        const select = fragment.querySelector("select");
+        if (!row || !select) return;
+
+        // Name must match the current day block's select name.
+        const existingSelect = items.querySelector("select[name]");
+        if (existingSelect) {
+          select.name = existingSelect.name;
+        }
+
+        items.appendChild(fragment);
+        wireRemoveButtons(items);
+      }
+
+      function wireRemoveButtons(scope) {
+        scope.querySelectorAll("[data-remove-workout]").forEach((btn) => {
+          if (btn.dataset.wired === "1") return;
+          btn.dataset.wired = "1";
+          btn.addEventListener("click", () => {
+            const row = btn.closest("[data-item-row]");
+            if (row) row.remove();
+            ensureAtLeastOneRow();
+          });
+        });
+      }
+
+      addBtn.addEventListener("click", () => addRow());
+      wireRemoveButtons(items);
+      ensureAtLeastOneRow();
+    }
+
+    document.querySelectorAll("[data-day-block]").forEach(wireDayBlock);
+  })();
+</script>
+{% endblock %}

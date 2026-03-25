@@ -1,0 +1,91 @@
+{% extends "base.html" %}
+
+{% block title %}{{ plan.name }} Progress{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <div>
+    <h2 class="mb-0">{{ plan.name }} Progress</h2>
+    <div class="text-muted small mt-1">
+      {% if plan.is_active %}
+        <span class="badge text-bg-success">Active</span>
+      {% else %}
+        <span class="badge text-bg-secondary">Inactive</span>
+      {% endif %}
+      <span class="ms-2">Weeks active: {{ plan.weeks_active|floatformat:1 }}</span>
+    </div>
+  </div>
+  <a href="{% url 'workout_plan_list' %}" class="btn btn-outline-secondary">Back to Plans</a>
+</div>
+
+<div class="row g-3 mb-4">
+  <div class="col-md-4">
+    <div class="card shadow-sm">
+      <div class="card-body">
+        <h6 class="text-muted mb-1">Completion</h6>
+        <div class="fs-3 fw-bold">{{ completion_percent }}%</div>
+        <div class="progress mt-2" role="progressbar" aria-label="Plan completion" aria-valuemin="0" aria-valuemax="100" aria-valuenow="{{ completion_percent }}">
+          <div class="progress-bar" style="width: {{ completion_percent }}%;"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="card shadow-sm">
+      <div class="card-body">
+        <h6 class="text-muted mb-1">Completed Days</h6>
+        <div class="fs-3 fw-bold text-success">{{ completed_count }} / {{ trackable_days }}</div>
+        {% if rest_count %}
+          <div class="text-muted small mt-1">Rest days: {{ rest_count }}</div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="card shadow-sm">
+      <div class="card-body">
+        <h6 class="text-muted mb-1">Missed Days (This Week)</h6>
+        <div class="fs-3 fw-bold text-danger">{{ missed_count }}</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="card shadow-sm">
+  <div class="card-header">Weekly Breakdown</div>
+  <div class="card-body p-0">
+    <div class="table-responsive">
+      <table class="table table-striped mb-0">
+        <thead>
+          <tr>
+            <th>Day</th>
+            <th>Workout</th>
+            <th>Notes</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for row in progress_days %}
+          <tr>
+            <td><strong>{{ row.day_label }}</strong></td>
+            <td>{{ row.workout_label }}</td>
+            <td>{{ row.notes|default:"-" }}</td>
+            <td>
+              {% if row.rest %}
+                <span class="badge text-bg-info">Rest</span>
+              {% elif row.completed %}
+                <span class="badge text-bg-success">Completed</span>
+              {% elif row.missed %}
+                <span class="badge text-bg-danger">Missed</span>
+              {% else %}
+                <span class="badge text-bg-secondary">Pending</span>
+              {% endif %}
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}

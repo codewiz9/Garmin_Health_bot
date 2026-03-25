@@ -1,0 +1,189 @@
+{% extends "base.html" %}
+
+{% block title %}Workout Plans{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h2 class="mb-0">Workout Plans</h2>
+  <div class="d-flex gap-2">
+    <form method="post" action="{% url 'import_garmin_workouts' %}">
+      {% csrf_token %}
+      <button type="submit" class="btn btn-outline-primary">Import Garmin Workouts</button>
+    </form>
+    <a href="{% url 'workout_plan_create' %}" class="btn btn-primary">Create Plan</a>
+  </div>
+</div>
+
+{% if plans %}
+  <div class="row g-3">
+    {% for plan in plans %}
+      <div class="col-12">
+        <div class="card shadow-sm">
+          <div class="card-body">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+              <div>
+                <h5 class="card-title mb-0">
+                  {{ plan.name }}
+                  {% if plan.is_active %}
+                    <span id="status-badge-{{ plan.pk }}" class="badge text-bg-success ms-2">Active</span>
+                  {% else %}
+                    <span id="status-badge-{{ plan.pk }}" class="badge text-bg-secondary ms-2">Inactive</span>
+                  {% endif %}
+                </h5>
+                <div class="text-muted small">
+                  Weeks active: <span id="weeks-active-{{ plan.pk }}">{{ plan.weeks_active|floatformat:1 }}</span>
+                </div>
+              </div>
+              <div class="d-flex gap-2">
+                <button
+                  type="button"
+                  class="btn btn-sm workout-plan-toggle {% if plan.is_active %}btn-outline-danger{% else %}btn-outline-success{% endif %}"
+                  data-plan-pk="{{ plan.pk }}"
+                  data-toggle-active-url="{% url 'workout_plan_toggle_active' plan.pk %}"
+                  data-weeks-target="weeks-active-{{ plan.pk }}"
+                  data-status-badge-target="status-badge-{{ plan.pk }}"
+                  aria-label="{% if plan.is_active %}Deactivate{% else %}Activate{% endif %} {{ plan.name }}"
+                >
+                  {% if plan.is_active %}Deactivate{% else %}Activate{% endif %}
+                </button>
+                <a href="{% url 'workout_plan_progress' plan.pk %}" class="btn btn-sm btn-outline-primary">Progress</a>
+                <a href="{% url 'workout_plan_update' plan.pk %}" class="btn btn-sm btn-outline-secondary">Edit</a>
+                <a href="{% url 'workout_plan_delete' plan.pk %}" class="btn btn-sm btn-outline-danger">Delete</a>
+              </div>
+            </div>
+            <ul class="list-group list-group-flush">
+              {% for day in plan.days.all %}
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                  <span>
+                    <strong>{{ day.get_day_display }}</strong>
+                    {% if day.items.all %}
+                      -
+                      {% for item in day.items.all %}
+                        {% if item.workout %}
+                          {{ item.workout.name|default:item.workout.garmin_workout_id }}
+                        {% elif item.cardio_activity %}
+                          {{ item.get_cardio_activity_display }}
+                        {% else %}
+                          Workout
+                        {% endif %}
+                        {% if not forloop.last %}, {% endif %}
+                      {% endfor %}
+                    {% else %}
+                      - No workout assigned
+                    {% endif %}
+                    {% if day.notes %}
+                      <div class="text-muted small">{{ day.notes }}</div>
+                    {% endif %}
+                  </span>
+                  <span class="d-flex align-items-center gap-2">
+                    {% if day.items.all %}
+                      {% with non_rest_count=0 completed_count=0 rest_count=0 %}
+                      {% endwith %}
+                    {% endif %}
+
+                    {% if not day.items.all %}
+                      <span class="badge text-bg-secondary">No workouts</span>
+                    {% else %}
+                      {% comment %}Per-item completion buttons so nothing is "dead" / non-functional.{% endcomment %}
+                      <div class="d-flex flex-wrap gap-1 justify-content-end">
+                        {% for item in day.items.all %}
+                          {% if item.completed %}
+                            <span class="badge text-bg-success">
+                              {% if item.workout %}
+                                Done: {{ item.workout.name|default:item.workout.garmin_workout_id }}
+                              {% elif item.cardio_activity %}
+                                Done: {{ item.get_cardio_activity_display }}
+                              {% else %}
+                                Done
+                              {% endif %}
+                            </span>
+                          {% else %}
+                            {% if item.cardio_activity == "rest" and not item.workout %}
+                              <span class="badge text-bg-info">Rest</span>
+                            {% else %}
+                              <form method="post" action="{% url 'workout_plan_complete' item.pk %}">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-sm btn-outline-success">Mark Complete</button>
+                              </form>
+                            {% endif %}
+                          {% endif %}
+                        {% endfor %}
+                      </div>
+                    {% endif %}
+                  </span>
+                </li>
+              {% empty %}
+                <li class="list-group-item text-muted">No days configured yet.</li>
+              {% endfor %}
+            </ul>
+          </div>
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+{% else %}
+  <div class="alert alert-info">No plans yet. Import workouts and create your first plan.</div>
+{% endif %}
+
+<script>
+  (function () {
+    function getCookie(name) {
+      const value = `; ${document.cookie}`;
+      const parts = value.split(`; ${name}=`);
+      if (parts.length === 2) return parts.pop().split(";").shift();
+      return "";
+    }
+
+    const csrftoken = getCookie("csrftoken");
+
+    async function togglePlan(button) {
+      const url = button.dataset.toggleActiveUrl;
+      const weeksTargetId = button.dataset.weeksTarget;
+      button.disabled = true;
+
+      try {
+        const res = await fetch(url, {
+          method: "POST",
+          headers: {
+            "X-CSRFToken": csrftoken,
+            "X-Requested-With": "XMLHttpRequest",
+          },
+          body: "",
+          credentials: "same-origin",
+        });
+
+        const data = await res.json();
+        if (!data.ok) {
+          throw new Error(data.error || "Request failed");
+        }
+
+        const weeksEl = document.getElementById(weeksTargetId);
+        if (weeksEl && typeof data.weeks_active === "number") {
+          weeksEl.textContent = Number(data.weeks_active).toFixed(1);
+        }
+
+        const isActive = Boolean(data.is_active);
+        const statusBadgeTargetId = button.dataset.statusBadgeTarget;
+        const badgeEl = statusBadgeTargetId ? document.getElementById(statusBadgeTargetId) : null;
+        if (badgeEl) {
+          badgeEl.textContent = isActive ? "Active" : "Inactive";
+          badgeEl.classList.remove("text-bg-success", "text-bg-secondary");
+          badgeEl.classList.add(isActive ? "text-bg-success" : "text-bg-secondary");
+        }
+        button.textContent = isActive ? "Deactivate" : "Activate";
+        button.classList.remove("btn-outline-success", "btn-outline-danger");
+        button.classList.add(isActive ? "btn-outline-danger" : "btn-outline-success");
+      } catch (err) {
+        // Fallback: alert so the button never "does nothing".
+        alert(err?.message || "Could not update plan activation.");
+      } finally {
+        button.disabled = false;
+      }
+    }
+
+    document.querySelectorAll(".workout-plan-toggle").forEach((button) => {
+      button.addEventListener("click", () => togglePlan(button));
+    });
+  })();
+</script>
+{% endblock %}

@@ -3,10 +3,12 @@
 {% block content %}
 <div class="container mt-5">
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2>Garmin Health Dashboard</h2>
+        <h2>Garmin Health Dashboard(Last 30 days)</h2>
         <div>
             <a href="{% url 'garmin_bot_update_data' %}" class="btn btn-primary">Sync Latest Data</a>
             <a href="{% url 'garmin_bot_list_data' %}" class="btn btn-secondary">View History</a>
+            <a href="{% url 'garmin_bot_analysis' %}" class="btn btn-info">Analysis</a>
+            <a href="{% url 'garmin_settings' %}" class="btn btn-outline-dark">Settings</a>
         </div>
     </div>
 
@@ -26,7 +28,16 @@
             <div class="card bg-light">
                 <div class="card-body text-center">
                     <h5 class="card-title">VO2 Max</h5>
-                    <h2 class="text-success">{{ latest_data.VO2_max }}</h2>
+                    <h2 class="text-success">
+                        {% if latest_data.VO2_max %}
+                            {{ latest_data.VO2_max }}
+                            {% if vo2_rating %}
+                                <span class="badge bg-{{ vo2_rating_variant }} ms-2 align-middle">{{ vo2_rating }}</span>
+                            {% endif %}
+                        {% else %}
+                            <span class="text-muted">N/A</span>
+                        {% endif %}
+                    </h2>
                 </div>
             </div>
         </div>
@@ -34,22 +45,22 @@
             <div class="card bg-light">
                 <div class="card-body text-center">
                     <h5 class="card-title">Active Minutes</h5>
-                    <h2 class="text-info">{{ latest_data.active_minutes }} <small>min</small></h2>
+                    <h2 class="text-info">{{ latest_data.active_minutes|default_if_none:0 }} <small>min</small></h2>
                 </div>
             </div>
         </div>
     </div>
 
-    <h4 class="mt-4">Latest Activity Highlights</h4>
+    <h4 class="mt-4">Activity Highlights (Last 30 days)</h4>
     <div class="row">
         <!-- Running -->
         <div class="col-md-6 mb-3">
             <div class="card">
                 <div class="card-header bg-primary text-white">Running</div>
                 <div class="card-body">
-                    <p><strong>Distance:</strong> {{ latest_data.running.distance }}m</p>
-                    <p><strong>Duration:</strong> {{ latest_data.running.time }} min</p>
-                    <p><strong>Avg HR:</strong> {{ latest_data.running.avg_heart_rate }} bpm</p>
+                    <p><strong>Activities:</strong> {{ activity_summary.running.count }}</p>
+                    <p><strong>Total Distance:</strong> {{ activity_summary.running.distance_miles|floatformat:1 }} mi</p>
+                    <p><strong>Total Duration:</strong> {{ activity_summary.running.duration_minutes|floatformat:1 }} min</p>
                 </div>
             </div>
         </div>
@@ -58,9 +69,9 @@
             <div class="card">
                 <div class="card-header bg-success text-white">Cycling</div>
                 <div class="card-body">
-                    <p><strong>Distance:</strong> {{ latest_data.cycling.distance }}m</p>
-                    <p><strong>Duration:</strong> {{ latest_data.cycling.time }} min</p>
-                    <p><strong>Avg HR:</strong> {{ latest_data.cycling.avg_heart_rate }} bpm</p>
+                    <p><strong>Activities:</strong> {{ activity_summary.cycling.count }}</p>
+                    <p><strong>Total Distance:</strong> {{ activity_summary.cycling.distance_miles|floatformat:1 }} mi</p>
+                    <p><strong>Total Duration:</strong> {{ activity_summary.cycling.duration_minutes|floatformat:1 }} min</p>
                 </div>
             </div>
         </div>
@@ -69,9 +80,9 @@
             <div class="card">
                 <div class="card-header bg-info text-white">Swimming</div>
                 <div class="card-body">
-                    <p><strong>Distance:</strong> {{ latest_data.swimming.distance }}m</p>
-                    <p><strong>Duration:</strong> {{ latest_data.swimming.time }} min</p>
-                    <p><strong>Avg HR:</strong> {{ latest_data.swimming.avg_heart_rate }} bpm</p>
+                    <p><strong>Activities:</strong> {{ activity_summary.swimming.count }}</p>
+                    <p><strong>Total Distance:</strong> {{ activity_summary.swimming.distance_miles|floatformat:1 }} mi</p>
+                    <p><strong>Total Duration:</strong> {{ activity_summary.swimming.duration_minutes|floatformat:1 }} min</p>
                 </div>
             </div>
         </div>
@@ -80,15 +91,47 @@
             <div class="card">
                 <div class="card-header bg-secondary text-white">Strength Training</div>
                 <div class="card-body">
-                    <p><strong>Volume:</strong> {{ latest_data.lifting.volume }} kg</p>
-                    <p><strong>Sets/Reps:</strong> {{ latest_data.lifting.sets }}x{{ latest_data.lifting.reps }}</p>
+                    <p><strong>Activities:</strong> {{ activity_summary.lifting.count }}</p>
+                    <p><strong>Total Duration:</strong> {{ activity_summary.lifting.duration_minutes|floatformat:1 }} min</p>
                 </div>
             </div>
         </div>
     </div>
+
+    <h4 class="mt-4">Recent Imported Garmin Activities</h4>
+    {% if recent_activities %}
+    <div class="table-responsive">
+        <table class="table table-striped table-hover">
+            <thead class="table-dark">
+                <tr>
+                    <th>When</th>
+                    <th>Name</th>
+                    <th>Type</th>
+                    <th>Distance (mi)</th>
+                    <th>Duration (min)</th>
+                    <th>Calories</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for activity in recent_activities %}
+                <tr>
+                    <td>{{ activity.effective_start_time|date:"Y-m-d H:i" }}</td>
+                    <td>{{ activity.activity_name|default:activity.activity_id }}</td>
+                    <td><span class="badge bg-secondary">{{ activity.activity_type }}</span></td>
+                    <td>{{ activity.distance_miles|floatformat:1 }}</td>
+                    <td>{{ activity.duration_minutes|floatformat:1 }}</td>
+                    <td>{{ activity.calories|floatformat:0 }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="alert alert-info">No imported activities found yet. Click "Sync Latest Data" to import.</div>
+    {% endif %}
     {% else %}
     <div class="alert alert-warning mt-3">
-        No Garmin data found. Please sync your data using the button above. (Make sure you have linked your Garmin account in the Django Admin or Setup first!)
+        No Garmin data found yet. Please link your Garmin username/password in Settings, then sync your data.
     </div>
     {% endif %}
 </div>

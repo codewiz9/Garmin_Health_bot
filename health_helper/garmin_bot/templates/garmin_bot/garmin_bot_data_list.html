@@ -4,42 +4,37 @@
 <div class="container mt-5">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h2>Garmin Health History</h2>
-        <a href="{% url 'garmin_bot_detail' %}" class="btn btn-secondary">Back to Dashboard</a>
+        <div class="d-flex gap-2">
+            <a href="{% url 'garmin_bot_update_data' %}" class="btn btn-primary">Sync Latest Data</a>
+            <a href="{% url 'garmin_bot_detail' %}" class="btn btn-secondary">Back to Dashboard</a>
+        </div>
     </div>
 
-    {% if garmin_data_list %}
-    <div class="table-responsive">
-        <table class="table table-striped table-hover">
-            <thead class="table-dark">
-                <tr>
-                    <th>Date</th>
-                    <th>Resting HR</th>
-                    <th>VO2 Max</th>
-                    <th>Active Mins</th>
-                    <th>Latest Activity</th>
-                    <th>Running Dist</th>
-                    <th>Cycling Dist</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for record in garmin_data_list %}
-                <tr>
-                    <td><strong>{{ record.date_recorded }}</strong></td>
-                    <td>{{ record.heart_rate }} bpm</td>
-                    <td>{{ record.VO2_max }}</td>
-                    <td>{{ record.active_minutes }}</td>
-                    <td><span class="badge bg-secondary">{{ record.activty_type }}</span> ({{ record.activty_amount }}m)</td>
-                    <td>{{ record.running.distance }}m</td>
-                    <td>{{ record.cycling.distance }}m</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <div class="d-flex justify-content-between align-items-start gap-3 flex-wrap">
+                <div>
+                    <h5 class="card-title mb-1">Last synced</h5>
+                    {% if last_synced %}
+                        <p class="mb-0">
+                            <span class="badge bg-success">Synced</span>
+                            <strong>{{ last_synced|date:"Y-m-d" }}</strong>
+                        </p>
+                        {% if last_aggregation_days %}
+                            <p class="text-muted mb-0 mt-2">This sync covers the last {{ last_aggregation_days }} days.</p>
+                        {% endif %}
+                    {% else %}
+                        <p class="mb-0">
+                            <span class="badge bg-warning text-dark">Not synced yet</span>
+                        </p>
+                        <p class="text-muted mb-0 mt-2">Use “Sync Latest Data” to import your Garmin metrics.</p>
+                    {% endif %}
+                </div>
+                <div class="text-end">
+                    <a href="{% url 'garmin_bot_update_data' %}" class="btn btn-primary">Sync Now</a>
+                </div>
+            </div>
+        </div>
     </div>
-    {% else %}
-    <div class="alert alert-warning mt-3">
-        No historical Garmin data found.
-    </div>
-    {% endif %}
 </div>
 {% endblock %}

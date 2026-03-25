@@ -5,6 +5,7 @@ from .models import (
     SwimmingStats,
     CyclingStats,
     LiftingStats,
+    GarminActivity,
 )
 
 
@@ -41,3 +42,10 @@ class LiftingStatsAdmin(admin.ModelAdmin):
     list_display = ("user", "date_recorded", "weight", "reps", "sets", "volume", "time")
     list_filter = ("date_recorded",)
     search_fields = ("user__username",)
+
+
+@admin.register(GarminActivity)
+class GarminActivityAdmin(admin.ModelAdmin):
+    list_display = ("user", "activity_id", "activity_name", "activity_type", "start_time_local", "imported_at")
+    list_filter = ("activity_type", "start_time_local", "imported_at")
+    search_fields = ("user__username", "activity_id", "activity_name")

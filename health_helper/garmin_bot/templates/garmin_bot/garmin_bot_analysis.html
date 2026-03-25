@@ -1,0 +1,138 @@
+{% extends 'base.html' %}
+
+{% block title %}Garmin Analysis{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2 class="mb-0">Garmin Analysis</h2>
+        <div class="d-flex gap-2">
+            <a href="{% url 'garmin_bot_update_data' %}" class="btn btn-primary">Sync Latest Data</a>
+            <a href="{% url 'garmin_bot_detail' %}" class="btn btn-outline-secondary">Back to Dashboard</a>
+        </div>
+    </div>
+
+    {% if data_warnings %}
+    <div class="alert alert-warning">
+        <strong>Data Quality Notice:</strong>
+        <ul class="mb-0 mt-2">
+            {% for warning in data_warnings %}
+            <li>{{ warning }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+    {% endif %}
+
+    <div class="row g-3 mb-4">
+        <div class="col-md-4">
+            <div class="card shadow-sm h-100">
+                <div class="card-body">
+                    <h6 class="text-muted">Overall Fitness Score</h6>
+                    <div class="display-6 fw-bold">{{ overall_score }}/100</div>
+                    <div class="progress mt-2">
+                        <div class="progress-bar" role="progressbar" style="width: {{ overall_score }}%;" aria-valuenow="{{ overall_score }}" aria-valuemin="0" aria-valuemax="100"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card shadow-sm h-100">
+                <div class="card-body">
+                    <h6 class="text-muted">Training Load Status</h6>
+                    <h4 class="mb-2 text-capitalize">{{ training_load.status|cut:"_" }}</h4>
+                    <p class="mb-1"><strong>14-day Active Minutes:</strong> {{ training_load.active_minutes_14d }}</p>
+                    <p class="mb-0"><strong>Avg Daily Minutes:</strong> {{ training_load.avg_daily_minutes }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card shadow-sm h-100">
+                <div class="card-body">
+                    <h6 class="text-muted">Areas that need improvement</h6>
+                    {% if risk_flags %}
+                        <ul class="list-group list-group-flush">
+                            {% for flag in risk_flags %}
+                            <li class="list-group-item px-0">
+                                <span class="badge text-bg-warning me-2 align-middle">Focus</span>
+                                <span class="align-middle">{{ flag }}</span>
+                            </li>
+                            {% endfor %}
+                        </ul>
+                    {% else %}
+                        <p class="mb-0 text-muted">Nothing stands out right now—keep doing what you’re doing.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-3 mb-4">
+        <div class="col-md-6">
+            <div class="card shadow-sm h-100">
+                <div class="card-header bg-primary text-white">Running Analysis</div>
+                <div class="card-body">
+                    <p><strong>Score:</strong> {{ running_analysis.score }}/100 ({{ running_analysis.status }})</p>
+                    <p><strong>Runs (30d):</strong> {{ running_analysis.frequency_30d }}</p>
+                    <p><strong>Total Distance:</strong> {{ running_analysis.total_distance_miles|floatformat:1 }} mi</p>
+                    <p><strong>Avg Duration:</strong> {{ running_analysis.avg_duration_min }} min</p>
+                    <p class="mb-0"><strong>Recommendation:</strong> {{ running_analysis.recommendation }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card shadow-sm h-100">
+                <div class="card-header bg-secondary text-white">Lifting Analysis</div>
+                <div class="card-body">
+                    <p><strong>Score:</strong> {{ lifting_analysis.score }}/100 ({{ lifting_analysis.status }})</p>
+                    <p><strong>Sessions (30d):</strong> {{ lifting_analysis.sessions_30d }}</p>
+                    <p><strong>Total Duration:</strong> {{ lifting_analysis.total_duration_min }} min</p>
+                    <p class="mb-0"><strong>Recommendation:</strong> {{ lifting_analysis.recommendation }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card shadow-sm">
+        <div class="card-header bg-dark text-white">Tailored Workouts</div>
+        <div class="card-body">
+            {% if recommendations %}
+            <div class="table-responsive">
+                <table class="table table-striped mb-0">
+                    <thead>
+                        <tr>
+                            <th>Exercise</th>
+                            <th>Category</th>
+                            <th>Level</th>
+                            <th>Reason</th>
+                            <th>Search</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in recommendations %}
+                        <tr>
+                            <td>{{ item.name }}</td>
+                            <td class="text-capitalize">{{ item.category }}</td>
+                            <td class="text-capitalize">{{ item.level }}</td>
+                            <td>{{ item.reason }}</td>
+                            <td class="text-nowrap">
+                                {% if item.name %}
+                                    <a class="btn btn-sm btn-outline-primary" target="_blank" rel="noopener noreferrer"
+                                       href="https://www.google.com/search?q={{ item.name|urlencode }}%20exercise">
+                                        <i class="bi bi-search me-1"></i>Search
+                                    </a>
+                                {% else %}
+                                    <span class="text-muted small">—</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <p class="mb-0">No recommendations available yet.</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

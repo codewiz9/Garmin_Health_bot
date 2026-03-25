@@ -44,6 +44,9 @@
                             <span class="nav-link text-white-50">Welcome, {{ user.username }}</span>
                         </li>
                         <li class="nav-item">
+                            <a class="nav-link" href="{% url 'garmin_settings' %}">Settings</a>
+                        </li>
+                        <li class="nav-item">
                             <form method="post" action="{% url 'logout' %}" style="display:inline;">
                                 {% csrf_token %}
                                 <button type="submit" class="btn btn-danger btn-sm ms-2 mt-1">Logout</button>
